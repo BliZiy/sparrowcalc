@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bliziy.github.io/sparrowcalc/sitemap.xml
