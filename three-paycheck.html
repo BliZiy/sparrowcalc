@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biweekly 3-Paycheck Month Calculator — SparrowCalc</title>
+<meta name="description" content="Free biweekly payday calculator. Enter one payday and a year to list every payday and spot the months with three paychecks.">
+<link rel="canonical" href="https://bliziy.github.io/sparrowcalc/three-paycheck.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SparrowCalc">
+<meta property="og:title" content="Biweekly 3-Paycheck Month Calculator — SparrowCalc">
+<meta property="og:description" content="Free biweekly payday calculator. Enter one payday and a year to list every payday and spot the months with three paychecks.">
+<meta property="og:url" content="https://bliziy.github.io/sparrowcalc/three-paycheck.html">
+<meta name="theme-color" content="#1F3A5F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%238FA98F'/%3E%3Cpath d='M14 38c6-14 20-20 32-16 4 1 6 4 6 4l-6 2c-2 9-12 15-24 13l-8 7 2-8c-1-1-2-1-2-2z' fill='%231F3A5F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#8FA98F"/><path d="M14 38c6-14 20-20 32-16 4 1 6 4 6 4l-6 2c-2 9-12 15-24 13l-8 7 2-8c-1-1-2-1-2-2z" fill="#1F3A5F"/><path d="M24 36c6-1 12-5 15-10-2 8-8 13-17 14z" fill="#D9A441"/><circle cx="45" cy="27" r="1.8" fill="#FAF6EC"/></svg><span><span class="brand-name">SparrowCalc</span><span class="brand-tag">Free paycheck money tools</span></span></a>
+    <nav class="nav" aria-label="Tools"><a href="index.html">All tools</a><a href="semi-monthly.html">1st & 15th planner</a><a href="three-paycheck.html" aria-current="page">3-paycheck months</a><a href="debt-compare.html">Snowball vs avalanche</a></nav>
+  </div>
+</header>
+<section class="hero">
+  <div class="wrap">
+    <h1>Biweekly 3-paycheck month finder</h1>
+    <p>Paid every two weeks? That's 26 paychecks a year (sometimes 27), so most years have two months with three paydays. Enter any one of your paydays and a year to see them all.</p>
+  </div>
+</section>
+<main id="main" class="wrap">
+  <form id="form" class="panel" novalidate>
+    <div class="row">
+      <div>
+        <label for="anchor">One of your paydays</label>
+        <input id="anchor" type="date">
+        <p class="hint">Any real payday works, past or future.</p>
+      </div>
+      <div>
+        <label for="year-input">Year to show</label>
+        <input id="year-input" type="number" inputmode="numeric" min="1900" max="2200" step="1">
+      </div>
+      <div>
+        <label for="net">Net pay per check ($, optional)</label>
+        <input id="net" type="number" inputmode="decimal" min="0" step="0.01" placeholder="e.g. 1400">
+        <p class="hint">Shows how much "extra" money the 3rd check brings.</p>
+      </div>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <div id="errors"></div>
+    <div class="results" id="summary"></div>
+    <h2 id="months-title">Paydays by month</h2>
+    <div class="months" id="months"></div>
+  </section>
+
+  <aside class="cta">
+    <div>
+      <h3>Plan every paycheck, plus the bill calendar</h3>
+      <p>The Sheetsparrow Biweekly Paycheck Budget builds all 26 paychecks from your first payday, flags 3-paycheck months, and includes a bill calendar and sinking-funds tracker. Works in Excel and Google Sheets.</p>
+      <p class="small">Or get it in the <a href="https://payhip.com/b/sR1Xy" rel="noopener">$19 bundle</a> with all four planners.</p>
+    </div>
+    <a class="buy" href="https://payhip.com/b/NT3nH" rel="noopener">Get the spreadsheet: $7</a>
+  </aside>
+
+  <div class="prose">
+    <h2>Why 3-paycheck months matter</h2>
+    <p>Many biweekly budgeters plan each month around <strong>two</strong> paychecks. Then in the two months with a third check, that whole check is free: none of your regular bills depend on it. Common uses are an emergency fund, an extra debt payment, or sinking funds for car repairs and holidays.</p>
+    <p>In some years a biweekly schedule has <strong>27</strong> paydays. That happens when January 1 (or January 2 in a leap year) is a payday. Your employer's pay calendar always wins if it differs, for example when a payday moves because of a bank holiday.</p>
+  </div>
+</main>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  'use strict';
+  var DAY = 86400000;
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var anchorEl = document.getElementById('anchor'), yearEl = document.getElementById('year-input'), netEl = document.getElementById('net');
+
+  // Defaults: next Friday, and next year once we're past August
+  var now = new Date();
+  var today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  var dow = new Date(today).getUTCDay();
+  var nextFri = today + ((5 - dow + 7) % 7) * DAY;
+  anchorEl.value = new Date(nextFri).toISOString().slice(0,10);
+  yearEl.value = now.getFullYear() + (now.getMonth() >= 8 ? 1 : 0);
+
+  function parseISO(s){
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if(!m) return NaN;
+    var t = Date.UTC(+m[1], +m[2]-1, +m[3]);
+    var d = new Date(t);
+    return (d.getUTCMonth() === +m[2]-1 && d.getUTCDate() === +m[3]) ? t : NaN;
+  }
+  function fmtDate(t){ var d = new Date(t); return WEEKDAYS[d.getUTCDay()] + ' ' + MONTHS[d.getUTCMonth()].slice(0,3) + ' ' + d.getUTCDate(); }
+
+  function paydays(anchor, year){
+    var start = Date.UTC(year, 0, 1), end = Date.UTC(year, 11, 31);
+    var offsetDays = Math.round((start - anchor) / DAY);
+    var shift = ((-offsetDays % 14) + 14) % 14; // days from Jan 1 to first payday on the cycle
+    var out = [];
+    for(var t = start + shift * DAY; t <= end; t += 14 * DAY) out.push(t);
+    return out;
+  }
+  window.SC_paydays = paydays; // exposed for testing
+
+  function calc(){
+    var errs = [];
+    var anchor = parseISO(anchorEl.value);
+    var year = parseInt(yearEl.value, 10);
+    var net = netEl.value.trim() === '' ? NaN : SC.num(netEl.value);
+    if(!isFinite(anchor)) errs.push('Pick one of your paydays.');
+    if(!(year >= 1900 && year <= 2200)) errs.push('Enter a year between 1900 and 2200.');
+    document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    if(errs.length){ document.getElementById('summary').innerHTML=''; document.getElementById('months').innerHTML=''; return; }
+    var list = paydays(anchor, year);
+    var byMonth = MONTHS.map(function(){ return []; });
+    list.forEach(function(t){ byMonth[new Date(t).getUTCMonth()].push(t); });
+    var three = [];
+    byMonth.forEach(function(arr, i){ if(arr.length >= 3) three.push(MONTHS[i]); });
+    function stat(k, v, cls){ return '<div class="stat '+(cls||'')+'"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+    var s = stat('Paydays in ' + year, list.length + (list.length === 27 ? ' <span class="badge">27-pay year</span>' : ''));
+    s += stat('3-paycheck months', three.length ? SC.esc(three.join(' & ')) : 'None', 'win');
+    if(isFinite(net) && net >= 0) s += stat('"Extra" from 3rd checks', SC.money(net * three.length), 'win');
+    document.getElementById('summary').innerHTML = s;
+    document.getElementById('months-title').textContent = 'Paydays by month, ' + year;
+    document.getElementById('months').innerHTML = byMonth.map(function(arr, i){
+      return '<div class="month'+(arr.length >= 3 ? ' three' : '')+'"><b>'+MONTHS[i]+'</b>'+(arr.length >= 3 ? ' <span class="badge">3 checks</span>' : '') +
+        '<ul>'+arr.map(function(t){ return '<li>'+fmtDate(t)+'</li>'; }).join('')+'</ul></div>';
+    }).join('');
+  }
+  document.getElementById('form').addEventListener('input', calc);
+  document.getElementById('form').addEventListener('change', calc);
+  calc();
+});
+</script>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="disclaimer"><strong>Please note:</strong> SparrowCalc is for personal budgeting only. It is not financial, tax, or legal advice, and results are estimates based on what you enter. Check important numbers with your lender, employer, or a qualified professional. Designed with the help of AI tools.</p>
+    <div class="links">
+      <a href="index.html">All tools</a>
+      <a href="https://payhip.com/Sheetsparrow" rel="noopener">Sheetsparrow spreadsheet store</a>
+      <a href="https://payhip.com/b/QioZp" rel="noopener">Free simple monthly budget</a>
+    </div>
+    <p>Private by design: everything is calculated in your browser. Nothing you type is sent or stored anywhere. No ads, no tracking.</p>
+    <p>&copy; <span id="year">2026</span> SparrowCalc by Sheetsparrow.</p>
+  </div>
+</footer>
+<script src="common.js"></script>
+</body>
+</html>
