@@ -1,0 +1,129 @@
+<section class="hero">
+  <div class="wrap">
+    <h1>1st &amp; 15th paycheck bill planner</h1>
+    <p>Enter your take-home pay and your bills. Bills due on the 1st through 14th come out of the <strong>1st</strong> paycheck, and bills due on the 15th through 31st come out of the <strong>15th</strong> paycheck. You can move any bill to the other check.</p>
+  </div>
+</section>
+<main id="main" class="wrap">
+  <form id="form" class="panel" novalidate>
+    <div class="row">
+      <div>
+        <label for="pay1">Net pay on the 1st ($)</label>
+        <input id="pay1" type="number" inputmode="decimal" min="0" step="0.01" value="1850">
+        <p class="hint">Take-home pay after taxes and deductions.</p>
+      </div>
+      <div>
+        <label for="pay2">Net pay on the 15th ($)</label>
+        <input id="pay2" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Same as the 1st">
+        <p class="hint">Leave blank if it's the same.</p>
+      </div>
+    </div>
+    <h2 style="margin-top:.6em">Bills</h2>
+    <div class="bills">
+      <div class="list-head"><span>Bill</span><span>Amount ($)</span><span>Due day (1–31)</span><span>Paid from</span><span></span></div>
+      <div id="bills"></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn secondary" id="add">+ Add bill</button>
+      <button type="button" class="btn secondary" id="clear">Clear all</button>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <h2>Your two paychecks</h2>
+    <div id="errors"></div>
+    <div class="results" id="summary"></div>
+    <div id="detail"></div>
+  </section>
+
+  <aside class="cta">
+    <div>
+      <h3>Track it all year in a spreadsheet</h3>
+      <p>The Sheetsparrow Semi-Monthly Budget Spreadsheet does this automatically for every month, with planned vs actual columns, a 12-month summary, and a chart. Works in Excel and Google Sheets.</p>
+      <p class="small">Or get it in the <a href="https://payhip.com/b/sR1Xy" rel="noopener">$19 bundle</a> with all four planners.</p>
+    </div>
+    <a class="buy" href="https://payhip.com/b/t9Hd8" rel="noopener">Get the spreadsheet: $7</a>
+  </aside>
+
+  <div class="prose">
+    <h2>How the split works</h2>
+    <p>A check that arrives on the 1st has to cover everything due before the next check on the 15th. So bills due on days 1–14 go to the 1st paycheck and bills due on days 15–31 go to the 15th paycheck. If one check ends up short, use "Paid from" to move a flexible bill to the other check, or ask the company if you can change the due date.</p>
+    <p>Tip: if your employer pays early when the 1st or 15th falls on a weekend, plan for that check to arrive a day or two before the bills it covers.</p>
+  </div>
+</main>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  'use strict';
+  var billsEl = document.getElementById('bills');
+  var sample = [
+    ['Rent', 1400, 1], ['Car payment', 320, 5], ['Phone', 65, 9], ['Internet', 60, 12],
+    ['Car insurance', 140, 15], ['Electric', 110, 18], ['Credit card minimum', 75, 22], ['Streaming', 16, 28]
+  ];
+  function addRow(name, amt, day, who){
+    var r = SC.el('div', {'class':'list-row'});
+    r.innerHTML =
+      '<label class="cell name-cell"><span class="cap">Bill</span><input class="name" aria-label="Bill name" placeholder="Bill name" maxlength="60"></label>' +
+      '<label class="cell"><span class="cap">Amount ($)</span><input class="amt" aria-label="Amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></label>' +
+      '<label class="cell"><span class="cap">Due day</span><input class="day" aria-label="Due day of month" type="number" inputmode="numeric" min="1" max="31" step="1" placeholder="1–31"></label>' +
+      '<label class="cell"><span class="cap">Paid from</span><select class="who" aria-label="Paid from"><option value="auto">Auto</option><option value="1">1st check</option><option value="15">15th check</option></select></label>' +
+      '<button type="button" class="btn icon" aria-label="Remove bill" title="Remove">&times;</button>';
+    r.querySelector('.name').value = name || '';
+    r.querySelector('.amt').value = (amt != null ? amt : '');
+    r.querySelector('.day').value = (day != null ? day : '');
+    r.querySelector('.who').value = who || 'auto';
+    r.querySelector('button').addEventListener('click', function(){ r.remove(); calc(); });
+    billsEl.appendChild(r);
+  }
+  sample.forEach(function(b){ addRow(b[0], b[1], b[2]); });
+  document.getElementById('add').addEventListener('click', function(){ addRow(); billsEl.lastChild.querySelector('.name').focus(); });
+  document.getElementById('clear').addEventListener('click', function(){ billsEl.innerHTML=''; addRow(); calc(); });
+  document.getElementById('form').addEventListener('input', calc);
+  document.getElementById('form').addEventListener('change', calc);
+
+  function calc(){
+    var errs = [];
+    var p1 = SC.num(document.getElementById('pay1').value);
+    var p2raw = document.getElementById('pay2').value.trim();
+    var p2 = p2raw === '' ? p1 : SC.num(p2raw);
+    if(!isFinite(p1) || p1 < 0){ errs.push('Enter your net pay on the 1st (a number of 0 or more).'); p1 = 0; }
+    if(!isFinite(p2) || p2 < 0){ errs.push('Net pay on the 15th must be a number of 0 or more.'); p2 = 0; }
+    var halves = {'1':{pay:p1,bills:[],total:0}, '15':{pay:p2,bills:[],total:0}};
+    Array.prototype.forEach.call(billsEl.children, function(r, i){
+      var name = r.querySelector('.name').value.trim() || ('Bill ' + (i+1));
+      var amtS = r.querySelector('.amt').value, dayS = r.querySelector('.day').value;
+      if(amtS === '' && dayS === '' && !r.querySelector('.name').value.trim()) return; // empty row
+      var amt = SC.num(amtS), day = parseInt(dayS, 10);
+      if(!isFinite(amt) || amt < 0){ errs.push(SC.esc(name) + ': enter an amount.'); return; }
+      if(!(day >= 1 && day <= 31) || String(day) !== String(dayS).trim()){ errs.push(SC.esc(name) + ': due day must be a whole number from 1 to 31.'); return; }
+      var who = r.querySelector('.who').value;
+      var half = who === 'auto' ? (day <= 14 ? '1' : '15') : who;
+      halves[half].bills.push({name:name, amt:amt, day:day, moved: who !== 'auto'});
+      halves[half].total += amt;
+    });
+    document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    var left1 = halves['1'].pay - halves['1'].total, left15 = halves['15'].pay - halves['15'].total;
+    function stat(k, v, cls){ return '<div class="stat '+(cls||'')+'"><div class="k">'+k+'</div><div class="v">'+SC.money(v)+'</div></div>'; }
+    document.getElementById('summary').innerHTML =
+      stat('Left from the 1st paycheck', left1, left1 < 0 ? 'neg' : '') +
+      stat('Left from the 15th paycheck', left15, left15 < 0 ? 'neg' : '') +
+      stat('Left for the whole month', left1 + left15, (left1 + left15) < 0 ? 'neg' : 'win');
+    var html = '';
+    if(left1 < 0 && left15 > 0 || left15 < 0 && left1 > 0){
+      html += '<div class="notice">One paycheck is short but the other has money left. Try moving a flexible bill to the other check with "Paid from," or ask that company to change your due date.</div>';
+    } else if(left1 < 0 && left15 < 0){
+      html += '<div class="notice">Both paychecks are short this month. Look for bills you can lower, pause, or spread out.</div>';
+    }
+    [['1','1st'],['15','15th']].forEach(function(h){
+      var d = halves[h[0]];
+      d.bills.sort(function(a,b){ return a.day - b.day; });
+      html += '<h3 style="margin-top:1.2em">'+h[1]+' paycheck: '+SC.money(d.pay)+' in, '+SC.money(d.total)+' in bills</h3>';
+      if(!d.bills.length){ html += '<p class="hint">No bills assigned to this check.</p>'; return; }
+      html += '<div class="table-scroll"><table><thead><tr><th>Bill</th><th class="num">Due day</th><th class="num">Amount</th></tr></thead><tbody>' +
+        d.bills.map(function(b){ return '<tr><td>'+SC.esc(b.name)+(b.moved?' <small>(moved)</small>':'')+'</td><td class="num">'+b.day+'</td><td class="num">'+SC.money(b.amt)+'</td></tr>'; }).join('') +
+        '<tr class="flag"><td>Left over</td><td></td><td class="num">'+SC.money(d.pay - d.total)+'</td></tr></tbody></table></div>';
+    });
+    document.getElementById('detail').innerHTML = html;
+  }
+  calc();
+});
+</script>
