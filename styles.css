@@ -115,3 +115,5 @@ tr.flag td{background:#fbf1dc;font-weight:700}
   .cta{flex-direction:column;align-items:flex-start}
 }
 @media print{.site-header nav,.cta,.actions,.btn{display:none}body{background:#fff}}
+.result-link{background:#eef3ee;border-left:4px solid var(--gold);border-radius:8px;padding:10px 14px;margin:12px 0}
+.byline{color:#5a6470;font-size:.9rem}

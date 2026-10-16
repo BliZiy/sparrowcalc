@@ -18,6 +18,22 @@ PAGES = [
    "Free biweekly payday calculator. Enter one payday and a year to list every payday and spot the months with three paychecks."),
   ("debt-compare.html", "Snowball vs avalanche", "Debt Snowball vs Avalanche Calculator — SparrowCalc",
    "Free debt payoff calculator. Compare the snowball and avalanche methods for up to 5 debts: months to debt-free and total interest."),
+  ("articles.html", "Articles", "Paycheck Budgeting Articles — SparrowCalc",
+   "Practical guides for paycheck-to-paycheck budgeting: 3-paycheck months, debt snowball vs avalanche, and budgeting on the 1st and 15th."),
+  ("third-paycheck-month.html", None, "What to Do With a 3rd Paycheck in a Biweekly Month — SparrowCalc",
+   "Paid biweekly? Two months a year bring a third paycheck. Here's how to find them, plan ahead, and decide where that extra check should go."),
+  ("snowball-vs-avalanche.html", None, "Debt Snowball vs Avalanche: Which Payoff Method Fits You? — SparrowCalc",
+   "A plain-English comparison of the debt snowball and debt avalanche methods, with a worked example, trade-offs, and how to pick one you'll stick with."),
+  ("budgeting-1st-and-15th.html", None, "How to Budget When You're Paid on the 1st and 15th — SparrowCalc",
+   "A step-by-step guide to semi-monthly budgeting: split bills between the 1st and 15th paychecks, handle due dates, and avoid the mid-month crunch."),
+  ("about.html", None, "About SparrowCalc — Free paycheck money tools",
+   "Who makes SparrowCalc, why these free paycheck budgeting calculators exist, and how the site is funded."),
+  ("privacy.html", None, "Privacy Policy — SparrowCalc",
+   "SparrowCalc privacy policy: calculations happen in your browser and your inputs are never sent or stored. What GitHub Pages and outbound links may collect."),
+  ("contact.html", None, "Contact SparrowCalc",
+   "How to contact SparrowCalc: report a bug, suggest a calculator, or ask a question through GitHub Issues."),
+  ("disclosure.html", None, "Affiliate & Advertising Disclosure — SparrowCalc",
+   "How SparrowCalc makes money: links to Sheetsparrow spreadsheets and any future partner links, and how they are labeled."),
 ]
 
 LOGO = ('<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">'
@@ -34,7 +50,7 @@ def header(current, title, desc):
     cur = ' aria-current="page"'
     nav = "".join(
         f'<a href="{f}"{cur if f == current else ""}>{label}</a>'
-        for f, label, _, _ in PAGES)
+        for f, label, _, _ in PAGES if label)
     canon = BASE + ("" if current == "index.html" else current)
     return f"""<!doctype html>
 <html lang="en">
@@ -71,8 +87,13 @@ FOOTER = f"""
       <a href="index.html">All tools</a>
       <a href="{STORE}" rel="noopener">Sheetsparrow spreadsheet store</a>
       <a href="{FREE}" rel="noopener">Free simple monthly budget</a>
+      <a href="articles.html">Articles</a>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="contact.html">Contact</a>
+      <a href="disclosure.html">Affiliate Disclosure</a>
     </div>
-    <p>Private by design: everything is calculated in your browser. Nothing you type is sent or stored anywhere. No ads, no tracking.</p>
+    <p>Private by design: calculations happen entirely in your browser, and the numbers you enter are never sent to us or stored. Some links go to the Sheetsparrow store, which we own; see our <a href="disclosure.html">disclosure</a>.</p>
     <p>&copy; <span id="year">2026</span> SparrowCalc by Sheetsparrow.</p>
   </div>
 </footer>

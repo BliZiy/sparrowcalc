@@ -12,6 +12,8 @@ Live site: **https://bliziy.github.io/sparrowcalc/** (GitHub Pages from `main` /
 | `three-paycheck.html` | Biweekly payday list for any year from one known payday. Flags 3-paycheck months, 27-pay years, and the optional "extra" money | [Biweekly Budget + Bill Calendar, $7](https://payhip.com/b/NT3nH) |
 | `debt-compare.html` | Snowball vs avalanche for up to 5 debts plus an extra monthly payment. Monthly interest (APR/12), minimums roll over, and a 50-year cap catches payments too small to ever pay off the debt | [Debt Snowball & Avalanche, $6](https://payhip.com/b/vD1jB) |
 
+Also: `articles.html` (index) + 3 articles (`third-paycheck-month.html`, `snowball-vs-avalanche.html`, `budgeting-1st-and-15th.html`), and trust pages `about.html`, `privacy.html`, `contact.html` (GitHub Issues; email fallback is a TODO pending approval), `disclosure.html`.
+
 Also linked: [Irregular Income $8](https://payhip.com/b/0X1n7), [Bundle $19](https://payhip.com/b/sR1Xy), [Free budget](https://payhip.com/b/QioZp), and the [Store](https://payhip.com/Sheetsparrow).
 
 ## Privacy and tech
