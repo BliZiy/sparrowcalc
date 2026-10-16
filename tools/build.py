@@ -55,6 +55,7 @@ def header(current, title, desc):
     return f"""<!doctype html>
 <html lang="en">
 <head>
+<meta name="fo-verify" content="345d407e-57f1-4c84-8a3d-20f44d69ff19" />
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
