@@ -10,7 +10,7 @@ Live site: **https://bliziy.github.io/sparrowcalc/** (GitHub Pages from `main` /
 | `index.html` | The hub: tool list, a short intro, and Sheetsparrow product links | Store |
 | `semi-monthly.html` | 1st & 15th bill planner. Bills due on days 1–14 go to the 1st check and days 15–31 go to the 15th check, with a per-bill override. Shows what's left per check and for the month | [Semi-Monthly Budget, $7](https://payhip.com/b/t9Hd8) |
 | `three-paycheck.html` | Biweekly payday list for any year from one known payday. Flags 3-paycheck months, 27-pay years, and the optional "extra" money | [Biweekly Budget + Bill Calendar, $7](https://payhip.com/b/NT3nH) |
-| `debt-compare.html` | Snowball vs avalanche for up to 5 debts plus an extra monthly payment. Monthly interest (APR/12), minimums roll over, and a 50-year cap catches payments too small to ever pay off the debt | [Debt Snowball & Avalanche, $6](https://payhip.com/b/vD1jB) |
+| `debt-compare.html` | Snowball vs avalanche for up to 5 debts plus an extra monthly payment. Monthly interest (APR/12), minimums roll over, and a 50-year cap catches payments too small to ever pay off the debt | [Paycheck Budget System, $29](https://payhip.com/b/MZtfg) |
 
 Also: `articles.html` (index) + 3 articles (`third-paycheck-month.html`, `snowball-vs-avalanche.html`, `budgeting-1st-and-15th.html`), and trust pages `about.html`, `privacy.html`, `contact.html` (GitHub Issues; email fallback is a TODO pending approval), `disclosure.html`.
 
