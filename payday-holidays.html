@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="google-site-verification" content="ln2VgSW4yvhMRJu4jRiBcazNpzcHE45kvwoMJSPg-ww" />
+<meta name="fo-verify" content="345d407e-57f1-4c84-8a3d-20f44d69ff19" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payday Holiday Checker: Does Payday Fall on a Bank Holiday? — SparrowCalc</title>
+<meta name="description" content="Free payday holiday calculator. See which 1st &amp; 15th, biweekly, or monthly paydays fall on a weekend or Federal Reserve bank holiday, and whether you&#x27;ll likely be paid early.">
+<link rel="canonical" href="https://bliziy.github.io/sparrowcalc/payday-holidays.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SparrowCalc">
+<meta property="og:title" content="Payday Holiday Checker: Does Payday Fall on a Bank Holiday? — SparrowCalc">
+<meta property="og:description" content="Free payday holiday calculator. See which 1st &amp; 15th, biweekly, or monthly paydays fall on a weekend or Federal Reserve bank holiday, and whether you&#x27;ll likely be paid early.">
+<meta property="og:url" content="https://bliziy.github.io/sparrowcalc/payday-holidays.html">
+<meta name="theme-color" content="#1F3A5F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%238FA98F'/%3E%3Cpath d='M14 38c6-14 20-20 32-16 4 1 6 4 6 4l-6 2c-2 9-12 15-24 13l-8 7 2-8c-1-1-2-1-2-2z' fill='%231F3A5F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#8FA98F"/><path d="M14 38c6-14 20-20 32-16 4 1 6 4 6 4l-6 2c-2 9-12 15-24 13l-8 7 2-8c-1-1-2-1-2-2z" fill="#1F3A5F"/><path d="M24 36c6-1 12-5 15-10-2 8-8 13-17 14z" fill="#D9A441"/><circle cx="45" cy="27" r="1.8" fill="#FAF6EC"/></svg><span><span class="brand-name">SparrowCalc</span><span class="brand-tag">Free paycheck money tools</span></span></a>
+    <nav class="nav" aria-label="Tools"><a href="index.html">All tools</a><a href="semi-monthly.html">1st & 15th planner</a><a href="three-paycheck.html">3-paycheck months</a><a href="payday-holidays.html" aria-current="page">Payday holidays</a><a href="debt-compare.html">Snowball vs avalanche</a><a href="articles.html">Articles</a></nav>
+  </div>
+</header>
+<section class="hero">
+  <div class="wrap">
+    <h1>Payday holiday checker</h1>
+    <p>Does your payday land on a bank holiday or a weekend? Pick your pay schedule and a year to see every payday that may arrive early or late, using the Federal Reserve bank holiday calendar.</p>
+  </div>
+</section>
+<main id="main" class="wrap">
+  <form id="form" class="panel" novalidate>
+    <div class="row">
+      <div>
+        <label for="sched">Pay schedule</label>
+        <select id="sched">
+          <option value="semi">Semi-monthly (1st &amp; 15th)</option>
+          <option value="semi-last">Semi-monthly (15th &amp; last day)</option>
+          <option value="biweekly">Biweekly (every 2 weeks)</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+      <div id="anchor-wrap">
+        <label for="anchor">One of your paydays</label>
+        <input id="anchor" type="date">
+        <p class="hint">Biweekly only. Any real payday works.</p>
+      </div>
+      <div id="day-wrap">
+        <label for="mday">Day of month</label>
+        <input id="mday" type="number" inputmode="numeric" min="1" max="31" step="1" value="1">
+        <p class="hint">Monthly only. 29&ndash;31 use the last day in short months.</p>
+      </div>
+      <div>
+        <label for="year-input">Year</label>
+        <input id="year-input" type="number" inputmode="numeric" min="1900" max="2200" step="1">
+      </div>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <div id="errors"></div>
+    <div class="results" id="summary"></div>
+    <h2 id="list-title">Paydays that may move</h2>
+    <div class="months" id="moved"></div>
+    <p class="small">"Likely early" is the business day before (what most employers do). "If late" is the next business day. Your employer's pay calendar always wins.</p>
+    <p class="result-link">Plan bills around the paydays you actually get with the <a href="https://payhip.com/b/t9Hd8?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=payday-holidays" rel="noopener">Semi-Monthly Budget Spreadsheet ($7)</a> or the <a href="https://payhip.com/b/NT3nH?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=payday-holidays" rel="noopener">Biweekly Paycheck Budget + Bill Calendar ($7)</a>. <span class="small">(Sheetsparrow is our own spreadsheet shop.)</span></p>
+  </section>
+
+  <aside class="cta">
+    <div>
+      <h3>Put every payday and bill on one calendar</h3>
+      <p>The Sheetsparrow Biweekly Paycheck Budget builds all 26 paychecks from your first payday and includes a bill calendar, so a holiday-shifted deposit never catches you off guard. Works in Excel and Google Sheets.</p>
+    </div>
+    <a class="buy" href="https://payhip.com/b/NT3nH?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=payday-holidays" rel="noopener">Get the spreadsheet: $7</a>
+  </aside>
+
+  <div class="prose">
+    <h2>What happens when payday falls on a holiday?</h2>
+    <p>Direct deposits move through the ACH network, which doesn't settle payments on weekends or Federal Reserve holidays. When a payday lands on one of those days, most employers pay on the business day <strong>before</strong>; some pay the business day <strong>after</strong>.</p>
+    <p>Two rules people often miss: when a holiday falls on a <strong>Saturday</strong>, Federal Reserve Banks stay open the Friday before, so Friday deposits usually aren't affected. When a holiday falls on a <strong>Sunday</strong>, banks close the following Monday. In 2027 that means Monday, July 5 is closed, while Friday, June 18 and Friday, December 24 are normal banking days.</p>
+    <p>The holiday dates here follow the Federal Reserve's published rules and are calculated in your browser, so nothing you enter is sent anywhere. This tool is educational and is not financial advice.</p>
+  </div>
+</main>
+<script src="payday-holidays.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  'use strict';
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var $ = function(id){ return document.getElementById(id); };
+  var now = new Date();
+  var today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  $('anchor').value = new Date(today + ((5 - new Date(today).getUTCDay() + 7) % 7) * 86400000).toISOString().slice(0,10);
+  $('year-input').value = now.getFullYear() + (now.getMonth() >= 8 ? 1 : 0);
+  function parseISO(s){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); if(!m) return NaN; var t = Date.UTC(+m[1], +m[2]-1, +m[3]), d = new Date(t); return (d.getUTCMonth() === +m[2]-1 && d.getUTCDate() === +m[3]) ? t : NaN; }
+  function fmt(t){ var d = new Date(t); return WD[d.getUTCDay()] + ' ' + MONTHS[d.getUTCMonth()].slice(0,3) + ' ' + d.getUTCDate() + (d.getUTCFullYear() !== +$('year-input').value ? ', ' + d.getUTCFullYear() : ''); }
+  function stat(k, v, cls){ return '<div class="stat '+(cls||'')+'"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+  function calc(){
+    var type = $('sched').value, year = parseInt($('year-input').value, 10), errs = [], s;
+    $('anchor-wrap').hidden = type !== 'biweekly'; $('day-wrap').hidden = type !== 'monthly';
+    if(!(year >= 1900 && year <= 2200)) errs.push('Enter a year between 1900 and 2200.');
+    if(type === 'biweekly'){ var a = parseISO($('anchor').value); if(!isFinite(a)) errs.push('Pick one of your paydays.'); s = {type:'biweekly', anchor:a}; }
+    else if(type === 'monthly'){ var d = parseInt($('mday').value, 10); if(!(d >= 1 && d <= 31)) errs.push('Enter a day of the month from 1 to 31.'); s = {type:'monthly', day:d}; }
+    else s = {type:'semi', days: type === 'semi' ? [1,15] : [15,'last']};
+    $('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    if(errs.length){ $('summary').innerHTML = ''; $('moved').innerHTML = ''; return; }
+    var rows = SC_PH.check(s, year), moved = rows.filter(function(r){ return !r.ok; });
+    var hol = moved.filter(function(r){ return r.reason !== 'Saturday' && r.reason !== 'Sunday'; }).length;
+    $('summary').innerHTML = stat('Paydays in ' + year, rows.length) + stat('On a weekend', moved.length - hol) + stat('On a bank holiday', hol) + stat('Paid on time', rows.length - moved.length, 'win');
+    $('list-title').textContent = 'Paydays that may move in ' + year;
+    $('moved').innerHTML = moved.length ? moved.map(function(r){
+      return '<div class="month three"><b>' + fmt(r.date) + '</b> <span class="badge">' + SC.esc(r.reason) + '</span><ul><li>Likely early: ' + fmt(r.early) + '</li><li>If late: ' + fmt(r.late) + '</li></ul></div>';
+    }).join('') : '<p>Every payday this year is a normal banking day.</p>';
+  }
+  $('form').addEventListener('input', calc); $('form').addEventListener('change', calc);
+  calc();
+});
+</script>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="disclaimer"><strong>Please note:</strong> SparrowCalc is for personal budgeting only. It is not financial, tax, or legal advice, and results are estimates based on what you enter. Check important numbers with your lender, employer, or a qualified professional. Designed with the help of AI tools.</p>
+    <div class="links">
+      <a href="index.html">All tools</a>
+      <a href="https://payhip.com/Sheetsparrow" rel="noopener">Sheetsparrow spreadsheet store</a>
+      <a href="https://payhip.com/b/QioZp" rel="noopener">Free simple monthly budget</a>
+      <a href="articles.html">Articles</a>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="contact.html">Contact</a>
+      <a href="disclosure.html">Affiliate Disclosure</a>
+    </div>
+    <p>Private by design: calculations happen entirely in your browser, and the numbers you enter are never sent to us or stored. Some links go to the Sheetsparrow store, which we own; see our <a href="disclosure.html">disclosure</a>.</p>
+    <p>&copy; <span id="year">2026</span> SparrowCalc by Sheetsparrow.</p>
+  </div>
+</footer>
+<script src="common.js"></script>
+</body>
+</html>

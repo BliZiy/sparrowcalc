@@ -16,6 +16,8 @@ PAGES = [
    "Free semi-monthly budget calculator. Enter your net pay and bills with due dates; see which bills come out of the 1st vs the 15th paycheck and what's left over."),
   ("three-paycheck.html", "3-paycheck months", "Biweekly 3-Paycheck Month Calculator — SparrowCalc",
    "Free biweekly payday calculator. Enter one payday and a year to list every payday and spot the months with three paychecks."),
+  ("payday-holidays.html", "Payday holidays", "Payday Holiday Checker: Does Payday Fall on a Bank Holiday? — SparrowCalc",
+   "Free payday holiday calculator. See which 1st & 15th, biweekly, or monthly paydays fall on a weekend or Federal Reserve bank holiday, and whether you'll likely be paid early."),
   ("debt-compare.html", "Snowball vs avalanche", "Debt Snowball vs Avalanche Calculator — SparrowCalc",
    "Free debt payoff calculator. Compare the snowball and avalanche methods for up to 5 debts: months to debt-free and total interest."),
   ("articles.html", "Articles", "Paycheck Budgeting Articles — SparrowCalc",
@@ -101,12 +103,16 @@ FOOTER = f"""
 <script src="common.js"></script>
 """
 
+# Hand-built pages outside PAGES that must stay in the sitemap
+EXTRA_SITEMAP = ["three-paycheck-months-2027.html"]
+
 def build():
     for f, _, title, desc in PAGES:
         body = (PARTS / f).read_text()
         (ROOT / f).write_text(header(f, title, desc) + body + FOOTER + "</body>\n</html>\n")
         print("wrote", f)
     urls = "".join(f"  <url><loc>{BASE}{'' if f=='index.html' else f}</loc></url>\n" for f, *_ in PAGES)
+    urls += "".join(f"  <url><loc>{BASE}{f}</loc></url>\n" for f in EXTRA_SITEMAP)
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n")
     (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}sitemap.xml\n")
