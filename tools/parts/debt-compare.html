@@ -12,11 +12,12 @@
     </div>
     <div class="actions">
       <button type="button" class="btn secondary" id="add">+ Add debt</button>
+      <button type="button" class="btn secondary" id="reset">Reset to example</button>
     </div>
     <div class="row" style="margin-top:14px">
       <div>
         <label for="extra">Extra payment each month ($)</label>
-        <input id="extra" type="number" inputmode="decimal" min="0" step="0.01" value="200">
+        <input id="extra" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" value="200">
         <p class="hint">On top of all your minimums. When a debt is paid off, its minimum rolls over to the next one.</p>
       </div>
     </div>
@@ -25,9 +26,12 @@
   <section aria-live="polite">
     <h2>Results</h2>
     <div id="errors"></div>
+    <div id="out">
     <div class="results" id="summary"></div>
     <div id="verdict"></div>
     <div id="detail"></div>
+    <div class="result-actions"><button type="button" class="btn secondary" id="copy">Copy results</button><button type="button" class="btn secondary" id="print">Print</button></div>
+    </div>
     <p class="result-link">Plan every paycheck with the <a href="https://payhip.com/b/MZtfg?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=debt-compare" rel="noopener">Paycheck Budget System ($29)</a>: a 7-lesson budgeting course plus the Sheetsparrow paycheck budget templates. <span class="small">(Sheetsparrow is our own spreadsheet shop.)</span> Read: <a href="snowball-vs-avalanche.html">Snowball vs avalanche explained</a>.</p>
     <p class="small">SparrowCalc readers: use code SPARROW10 at checkout for 10% off.</p>
   </section>
@@ -60,9 +64,9 @@ document.addEventListener('DOMContentLoaded', function(){
     var r = SC.el('div', {'class':'list-row'});
     r.innerHTML =
       '<label class="cell name-cell"><span class="cap">Debt</span><input class="name" aria-label="Debt name" placeholder="Debt name" maxlength="60"></label>' +
-      '<label class="cell"><span class="cap">Balance ($)</span><input class="bal" aria-label="Balance" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></label>' +
+      '<label class="cell"><span class="cap">Balance ($)</span><input class="bal" aria-label="Balance" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" placeholder="0.00"></label>' +
       '<label class="cell"><span class="cap">APR %</span><input class="apr" aria-label="APR percent" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="%"></label>' +
-      '<label class="cell"><span class="cap">Min. payment ($)</span><input class="min" aria-label="Minimum payment" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></label>' +
+      '<label class="cell"><span class="cap">Min. payment ($)</span><input class="min" aria-label="Minimum payment" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" placeholder="0.00"></label>' +
       '<button type="button" class="btn icon" aria-label="Remove debt" title="Remove">&times;</button>';
     r.querySelector('.name').value = n || '';
     r.querySelector('.bal').value = b != null ? b : '';
@@ -72,7 +76,14 @@ document.addEventListener('DOMContentLoaded', function(){
     debtsEl.appendChild(r); sync();
   }
   function sync(){ addBtn.disabled = debtsEl.children.length >= MAX; addBtn.textContent = addBtn.disabled ? 'Max 5 debts' : '+ Add debt'; }
-  sample.forEach(function(d){ addRow(d[0], d[1], d[2], d[3]); });
+  function loadSample(){ debtsEl.innerHTML = ''; sample.forEach(function(d){ addRow(d[0], d[1], d[2], d[3]); }); sync(); }
+  loadSample();
+  document.getElementById('reset').addEventListener('click', function(){ document.getElementById('extra').value = 200; loadSample(); calc(); });
+  document.getElementById('print').addEventListener('click', function(){ window.print(); });
+  document.getElementById('copy').addEventListener('click', function(){
+    var t = document.getElementById('out').innerText.replace(/Copy results\s*Print\s*$/, '').trim(), b = this;
+    if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy results'; }, 1500); });
+  });
   addBtn.addEventListener('click', function(){ addRow(); var l = debtsEl.lastChild; if(l) l.querySelector('.name').focus(); });
 
   // Core payoff simulation. Pure function: exposed as window.SC_simulate for testing.
@@ -106,23 +117,26 @@ document.addEventListener('DOMContentLoaded', function(){
   function dur(n){ var y = Math.floor(n / 12), m = n % 12; return (y ? y + ' yr ' : '') + (m || !y ? m + ' mo' : '').trim(); }
 
   function calc(){
-    var errs = [], debts = [];
+    var errs = [], debts = [], M = SC.MAX_MONEY;
     Array.prototype.forEach.call(debtsEl.children, function(r, i){
-      var name = r.querySelector('.name').value.trim() || ('Debt ' + (i+1));
-      var bS = r.querySelector('.bal').value, aS = r.querySelector('.apr').value, mS = r.querySelector('.min').value;
-      if(bS === '' && aS === '' && mS === '' && !r.querySelector('.name').value.trim()) return;
-      var b = SC.num(bS), a = aS === '' ? 0 : SC.num(aS), m = SC.num(mS);
-      if(!isFinite(b) || b < 0){ errs.push(SC.esc(name) + ': enter a balance.'); return; }
-      if(!isFinite(a) || a < 0 || a > 100){ errs.push(SC.esc(name) + ': APR must be between 0 and 100.'); return; }
-      if(!isFinite(m) || m < 0){ errs.push(SC.esc(name) + ': enter a minimum payment.'); return; }
-      if(b > 0) debts.push({name:name, balance:b, apr:a, min:m});
+      var label = 'Row ' + (i+1) + ' (' + (r.querySelector('.name').value.trim() || 'Debt ' + (i+1)) + ')';
+      var bEl = r.querySelector('.bal'), aEl = r.querySelector('.apr'), mEl = r.querySelector('.min');
+      if(bEl.value === '' && aEl.value === '' && mEl.value === '' && !r.querySelector('.name').value.trim()){ [bEl, aEl, mEl].forEach(function(e){ SC.mark(e, ''); }); return; }
+      var cb = SC.check(bEl, {label:label + ' balance', min:0, max:M, required:true});
+      var ca = SC.check(aEl, {label:label + ' APR', min:0, max:100, blankValue:0});
+      var cm = SC.check(mEl, {label:label + ' minimum payment', min:0, max:M, required:true});
+      [cb, ca, cm].forEach(function(c){ if(!c.ok) errs.push(SC.esc(c.msg)); });
+      if(cb.ok && ca.ok && cm.ok && cb.v > 0) debts.push({name:r.querySelector('.name').value.trim() || ('Debt ' + (i+1)), balance:cb.v, apr:ca.v, min:cm.v});
     });
-    var extra = document.getElementById('extra').value.trim() === '' ? 0 : SC.num(document.getElementById('extra').value);
-    if(!isFinite(extra) || extra < 0){ errs.push('Extra payment must be 0 or more.'); extra = 0; }
+    var ce = SC.check(document.getElementById('extra'), {label:'Extra payment each month', min:0, max:M, blankValue:0});
+    if(!ce.ok) errs.push(ce.msg);
+    var extra = ce.ok ? ce.v : 0;
     if(!debts.length && !errs.length) errs.push('Add at least one debt with a balance.');
-    document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('') +
+      (errs.length && debts.length ? '<div class="blocked">Results are hidden while any row is invalid: leaving a debt out would make the debt-free date and interest totals wrong.</div>' : '');
     var sumEl = document.getElementById('summary'), vEl = document.getElementById('verdict'), dEl = document.getElementById('detail');
-    if(!debts.length){ sumEl.innerHTML = vEl.innerHTML = dEl.innerHTML = ''; return; }
+    document.getElementById('out').hidden = errs.length > 0;
+    if(errs.length){ sumEl.innerHTML = vEl.innerHTML = dEl.innerHTML = ''; return; }
 
     var sb = simulate(debts, extra, 'snowball'), av = simulate(debts, extra, 'avalanche');
     var monthly = debts.reduce(function(s, d){ return s + d.min; }, 0) + extra;

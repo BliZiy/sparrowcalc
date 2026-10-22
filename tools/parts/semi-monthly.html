@@ -9,12 +9,12 @@
     <div class="row">
       <div>
         <label for="pay1">Net pay on the 1st ($)</label>
-        <input id="pay1" type="number" inputmode="decimal" min="0" step="0.01" value="1850">
+        <input id="pay1" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" value="1850">
         <p class="hint">Take-home pay after taxes and deductions.</p>
       </div>
       <div>
         <label for="pay2">Net pay on the 15th ($)</label>
-        <input id="pay2" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Same as the 1st">
+        <input id="pay2" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" placeholder="Same as the 1st">
         <p class="hint">Leave blank if it's the same.</p>
       </div>
     </div>
@@ -26,14 +26,18 @@
     <div class="actions">
       <button type="button" class="btn secondary" id="add">+ Add bill</button>
       <button type="button" class="btn secondary" id="clear">Clear all</button>
+      <button type="button" class="btn secondary" id="reset">Reset to example</button>
     </div>
   </form>
 
   <section aria-live="polite">
     <h2>Your two paychecks</h2>
     <div id="errors"></div>
+    <div id="out">
     <div class="results" id="summary"></div>
     <div id="detail"></div>
+    <div class="result-actions"><button type="button" class="btn secondary" id="copy">Copy results</button><button type="button" class="btn secondary" id="print">Print</button></div>
+    </div>
     <p class="result-link">Want to keep this plan all year? The <a href="https://payhip.com/b/t9Hd8?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=semi-monthly" rel="noopener">Semi-Monthly Budget Spreadsheet ($7)</a> splits bills between the 1st and 15th automatically, with planned vs actual tracking. New to budgeting? Start with the <a href="https://payhip.com/b/QioZp?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=semi-monthly" rel="noopener">free Simple Monthly Budget</a>. <span class="small">(Sheetsparrow is our own spreadsheet shop.)</span> Read: <a href="budgeting-1st-and-15th.html">How to budget on the 1st and 15th</a>.</p>
     <p class="small">Want the complete option? The <a href="https://payhip.com/b/MZtfg?utm_source=sparrowcalc&amp;utm_medium=result_cta&amp;utm_campaign=semi-monthly" rel="noopener">Paycheck Budget System ($29)</a> includes the course and all the templates.</p>
     <p class="small">SparrowCalc readers: use code SPARROW10 at checkout for 10% off.</p>
@@ -66,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var r = SC.el('div', {'class':'list-row'});
     r.innerHTML =
       '<label class="cell name-cell"><span class="cap">Bill</span><input class="name" aria-label="Bill name" placeholder="Bill name" maxlength="60"></label>' +
-      '<label class="cell"><span class="cap">Amount ($)</span><input class="amt" aria-label="Amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></label>' +
+      '<label class="cell"><span class="cap">Amount ($)</span><input class="amt" aria-label="Amount" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" placeholder="0.00"></label>' +
       '<label class="cell"><span class="cap">Due day</span><input class="day" aria-label="Due day of month" type="number" inputmode="numeric" min="1" max="31" step="1" placeholder="1–31"></label>' +
       '<label class="cell"><span class="cap">Paid from</span><select class="who" aria-label="Paid from"><option value="auto">Auto</option><option value="1">1st check</option><option value="15">15th check</option></select></label>' +
       '<button type="button" class="btn icon" aria-label="Remove bill" title="Remove">&times;</button>';
@@ -77,33 +81,46 @@ document.addEventListener('DOMContentLoaded', function(){
     r.querySelector('button').addEventListener('click', function(){ r.remove(); calc(); });
     billsEl.appendChild(r);
   }
-  sample.forEach(function(b){ addRow(b[0], b[1], b[2]); });
+  function loadSample(){ billsEl.innerHTML = ''; sample.forEach(function(b){ addRow(b[0], b[1], b[2]); }); }
+  loadSample();
+  document.getElementById('reset').addEventListener('click', function(){ document.getElementById('pay1').value = 1850; document.getElementById('pay2').value = ''; loadSample(); calc(); });
+  document.getElementById('print').addEventListener('click', function(){ window.print(); });
+  document.getElementById('copy').addEventListener('click', function(){
+    var t = document.getElementById('out').innerText.replace(/Copy results\s*Print\s*$/, '').trim(), b = this;
+    if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy results'; }, 1500); });
+  });
   document.getElementById('add').addEventListener('click', function(){ addRow(); billsEl.lastChild.querySelector('.name').focus(); });
   document.getElementById('clear').addEventListener('click', function(){ billsEl.innerHTML=''; addRow(); calc(); });
   document.getElementById('form').addEventListener('input', calc);
   document.getElementById('form').addEventListener('change', calc);
 
   function calc(){
-    var errs = [];
-    var p1 = SC.num(document.getElementById('pay1').value);
-    var p2raw = document.getElementById('pay2').value.trim();
-    var p2 = p2raw === '' ? p1 : SC.num(p2raw);
-    if(!isFinite(p1) || p1 < 0){ errs.push('Enter your net pay on the 1st (a number of 0 or more).'); p1 = 0; }
-    if(!isFinite(p2) || p2 < 0){ errs.push('Net pay on the 15th must be a number of 0 or more.'); p2 = 0; }
+    var errs = [], M = SC.MAX_MONEY;
+    var c1 = SC.check(document.getElementById('pay1'), {label:'Net pay on the 1st', min:0, max:M, required:true});
+    var c2 = SC.check(document.getElementById('pay2'), {label:'Net pay on the 15th', min:0, max:M, blankValue:null});
+    if(!c1.ok) errs.push(c1.msg);
+    if(!c2.ok) errs.push(c2.msg);
+    var p1 = c1.v, p2 = c2.v === null ? p1 : c2.v; // blank 15th = same as the 1st
     var halves = {'1':{pay:p1,bills:[],total:0}, '15':{pay:p2,bills:[],total:0}};
     Array.prototype.forEach.call(billsEl.children, function(r, i){
-      var name = r.querySelector('.name').value.trim() || ('Bill ' + (i+1));
-      var amtS = r.querySelector('.amt').value, dayS = r.querySelector('.day').value;
-      if(amtS === '' && dayS === '' && !r.querySelector('.name').value.trim()) return; // empty row
-      var amt = SC.num(amtS), day = parseInt(dayS, 10);
-      if(!isFinite(amt) || amt < 0){ errs.push(SC.esc(name) + ': enter an amount.'); return; }
-      if(!(day >= 1 && day <= 31) || String(day) !== String(dayS).trim()){ errs.push(SC.esc(name) + ': due day must be a whole number from 1 to 31.'); return; }
+      var label = r.querySelector('.name').value.trim() || ('Bill ' + (i+1));
+      var amtEl = r.querySelector('.amt'), dayEl = r.querySelector('.day');
+      if(amtEl.value === '' && dayEl.value === '' && !r.querySelector('.name').value.trim()){ SC.mark(amtEl, ''); SC.mark(dayEl, ''); return; } // empty row
+      var ca = SC.check(amtEl, {label:'Row ' + (i+1) + ' (' + label + ') amount', min:0, max:M, required:true});
+      var cd = SC.check(dayEl, {label:'Row ' + (i+1) + ' (' + label + ') due day', min:1, max:31, int:true, required:true});
+      if(!ca.ok) errs.push(SC.esc(ca.msg));
+      if(!cd.ok) errs.push(SC.esc(cd.msg));
+      if(!ca.ok || !cd.ok) return;
+      var amt = ca.v, day = cd.v;
       var who = r.querySelector('.who').value;
       var half = who === 'auto' ? (day <= 14 ? '1' : '15') : who;
-      halves[half].bills.push({name:name, amt:amt, day:day, moved: who !== 'auto'});
+      halves[half].bills.push({name:label, amt:amt, day:day, moved: who !== 'auto'});
       halves[half].total += amt;
     });
-    document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('') +
+      (errs.length ? '<div class="blocked">Results are hidden until the highlighted fields are fixed, so you never see totals built on a missing number.</div>' : '');
+    document.getElementById('out').hidden = errs.length > 0;
+    if(errs.length){ document.getElementById('summary').innerHTML = ''; document.getElementById('detail').innerHTML = ''; return; }
     var left1 = halves['1'].pay - halves['1'].total, left15 = halves['15'].pay - halves['15'].total;
     function stat(k, v, cls){ return '<div class="stat '+(cls||'')+'"><div class="k">'+k+'</div><div class="v">'+SC.money(v)+'</div></div>'; }
     document.getElementById('summary').innerHTML =

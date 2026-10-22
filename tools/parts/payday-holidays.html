@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function(){
     else if(type === 'monthly'){ var d = parseInt($('mday').value, 10); if(!(d >= 1 && d <= 31)) errs.push('Enter a day of the month from 1 to 31.'); s = {type:'monthly', day:d}; }
     else s = {type:'semi', days: type === 'semi' ? [1,15] : [15,'last']};
     $('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    $('list-title').hidden = errs.length > 0;
     if(errs.length){ $('summary').innerHTML = ''; $('moved').innerHTML = ''; return; }
     var rows = SC_PH.check(s, year), moved = rows.filter(function(r){ return !r.ok; });
     var hol = moved.filter(function(r){ return r.reason !== 'Saturday' && r.reason !== 'Sunday'; }).length;

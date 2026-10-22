@@ -117,3 +117,10 @@ tr.flag td{background:#fbf1dc;font-weight:700}
 @media print{.site-header nav,.cta,.actions,.btn{display:none}body{background:#fff}}
 .result-link{background:#eef3ee;border-left:4px solid var(--gold);border-radius:8px;padding:10px 14px;margin:12px 0}
 .byline{color:#5a6470;font-size:.9rem}
+
+/* validation + result actions */
+input[aria-invalid="true"]{border-color:var(--danger);background:#fff7f6}
+.field-err{display:block;font-size:.8rem;color:#9b2c24;margin-top:3px;font-weight:600}
+.blocked{background:#f3f1ea;border:1px dashed #b9b29f;border-radius:10px;padding:12px 14px;color:#5a5446;margin:10px 0}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+@media print{.site-header,.site-footer,form,.cta,.prose,.result-link,.result-actions,.hero p{display:none!important}}

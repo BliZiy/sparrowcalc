@@ -10,7 +10,7 @@
       <div>
         <label for="anchor">One of your paydays</label>
         <input id="anchor" type="date">
-        <p class="hint">Any real payday works, past or future.</p>
+        <p class="hint" id="anchor-hint">Any real payday works, past or future.</p>
       </div>
       <div>
         <label for="year-input">Year to show</label>
@@ -18,7 +18,7 @@
       </div>
       <div>
         <label for="net">Net pay per check ($, optional)</label>
-        <input id="net" type="number" inputmode="decimal" min="0" step="0.01" placeholder="e.g. 1400">
+        <input id="net" type="number" inputmode="decimal" min="0" max="1000000000" step="0.01" placeholder="e.g. 1400">
         <p class="hint">Shows how much "extra" money the 3rd check brings.</p>
       </div>
     </div>
@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', function(){
   var dow = new Date(today).getUTCDay();
   var nextFri = today + ((5 - dow + 7) % 7) * DAY;
   anchorEl.value = new Date(nextFri).toISOString().slice(0,10);
+  var exampleAnchor = anchorEl.value, hintEl = document.getElementById('anchor-hint');
+  function hint(){ hintEl.innerHTML = anchorEl.value === exampleAnchor ? '<strong>Example date</strong> (next Friday). Replace it with one of your real paydays.' : 'Any real payday works, past or future.'; }
+  hint();
   yearEl.value = now.getFullYear() + (now.getMonth() >= 8 ? 1 : 0);
 
   function parseISO(s){
@@ -88,10 +91,15 @@ document.addEventListener('DOMContentLoaded', function(){
     var errs = [];
     var anchor = parseISO(anchorEl.value);
     var year = parseInt(yearEl.value, 10);
-    var net = netEl.value.trim() === '' ? NaN : SC.num(netEl.value);
-    if(!isFinite(anchor)) errs.push('Pick one of your paydays.');
-    if(!(year >= 1900 && year <= 2200)) errs.push('Enter a year between 1900 and 2200.');
+    hint();
+    if(!isFinite(anchor)){ errs.push('Pick one of your paydays.'); SC.mark(anchorEl, 'Pick a valid date.'); } else SC.mark(anchorEl, '');
+    var cy = SC.check(yearEl, {label:'Year', min:1900, max:2200, int:true, required:true});
+    if(!cy.ok) errs.push('Enter a year between 1900 and 2200.');
+    var cn = SC.check(netEl, {label:'Net pay per check', min:0, max:SC.MAX_MONEY, blankValue:NaN});
+    if(!cn.ok) errs.push(cn.msg);
+    var net = cn.v;
     document.getElementById('errors').innerHTML = errs.map(function(e){ return '<div class="error">'+e+'</div>'; }).join('');
+    document.getElementById('months-title').hidden = errs.length > 0;
     if(errs.length){ document.getElementById('summary').innerHTML=''; document.getElementById('months').innerHTML=''; return; }
     var list = paydays(anchor, year);
     var byMonth = MONTHS.map(function(){ return []; });
