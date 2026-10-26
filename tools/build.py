@@ -31,7 +31,7 @@ PAGES = [
   ("about.html", None, "About SparrowCalc — Free paycheck money tools",
    "Who makes SparrowCalc, why these free paycheck budgeting calculators exist, and how the site is funded."),
   ("privacy.html", None, "Privacy Policy — SparrowCalc",
-   "SparrowCalc privacy policy: calculations happen in your browser and your inputs are never sent or stored. What GitHub Pages and outbound links may collect."),
+   "SparrowCalc privacy policy: calculations happen in your browser and your inputs are never sent or stored. Analytics (Google Analytics 4 and GoatCounter), GitHub Pages, and outbound links."),
   ("contact.html", None, "Contact SparrowCalc",
    "How to contact SparrowCalc: report a bug, suggest a calculator, or ask a question through GitHub Issues."),
   ("disclosure.html", None, "Affiliate & Advertising Disclosure — SparrowCalc",
@@ -71,6 +71,9 @@ def header(current, title, desc):
 <meta name="theme-color" content="#1F3A5F">
 <link rel="icon" href="{FAVICON}">
 <link rel="stylesheet" href="styles.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EBBVZXC4HF"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','G-EBBVZXC4HF',{{anonymize_ip:true}});</script>
+<script data-goatcounter="https://sparrowcalc.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>

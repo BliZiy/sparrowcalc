@@ -1,7 +1,9 @@
 // Headless checks: npm i jsdom@24 (outside repo, NODE_PATH ok) then node tools/test_pages.js
-const {JSDOM}=require('jsdom'),fs=require('fs'),R=require('path').resolve(__dirname,'..')+'/';
+const {JSDOM,ResourceLoader}=require('jsdom'),fs=require('fs'),R=require('path').resolve(__dirname,'..')+'/';
 let pass=0,fail=0;const ok=(c,m)=>{c?pass++:(fail++,console.log('FAIL',m))};
-function load(f){const d=new JSDOM(fs.readFileSync(R+f,'utf8'),{runScripts:'dangerously',resources:'usable',url:'file://'+R+f});
+// Only load local files: never fetch or run the analytics scripts (GA4/GoatCounter) during tests.
+class LocalOnly extends ResourceLoader{fetch(u,o){return u.startsWith('file:///')?super.fetch(u,o):null;}}
+function load(f){const d=new JSDOM(fs.readFileSync(R+f,'utf8'),{runScripts:'dangerously',resources:new LocalOnly(),url:'file://'+R+f});
  return new Promise(r=>d.window.addEventListener('load',()=>r(d.window)));}
 function set(w,el,v){el.value=v;el.dispatchEvent(new w.Event('input',{bubbles:true}));}
 (async()=>{

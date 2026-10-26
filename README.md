@@ -17,7 +17,7 @@ Also: `articles.html` (index) + 3 articles (`third-paycheck-month.html`, `snowba
 Also linked: [Irregular Income $8](https://payhip.com/b/0X1n7), [Bundle $19](https://payhip.com/b/sR1Xy), [Free budget](https://payhip.com/b/QioZp), and the [Store](https://payhip.com/Sheetsparrow).
 
 ## Privacy and tech
-- Plain HTML, CSS, and JavaScript. No build step needed to run it, no backend, no cookies, no analytics or tracking, no external fonts, scripts, or CDNs.
+- Plain HTML, CSS, and JavaScript. No build step needed to run it, no backend, no ads, no external fonts or CDNs. Analytics only: Google Analytics 4 (G-EBBVZXC4HF, uses cookies) and GoatCounter (sparrowcalc.goatcounter.com, cookie-free), added in each page's head by `tools/build.py`; hand-built pages (`three-paycheck-months-2027.html`) carry the same snippets.
 - Everything is calculated in the browser. Inputs are never sent or stored anywhere.
 - Every page has a disclaimer: it's for personal budgeting only, it's not financial, tax, or legal advice, and it was designed with the help of AI tools.
 

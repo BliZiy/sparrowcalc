@@ -1,4 +1,4 @@
-/* SparrowCalc shared helpers. Runs locally; no network calls, no tracking. */
+/* SparrowCalc shared helpers. Runs locally; makes no network calls and never sends calculator inputs anywhere. */
 (function(){
   'use strict';
   var fmt = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
