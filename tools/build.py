@@ -57,7 +57,7 @@ def header(current, title, desc):
     return f"""<!doctype html>
 <html lang="en">
 <head>
-<meta name="google-site-verification" content="ln2VgSW4yvhMRJu4jRiBcazNpzcHE45kvwoMJSPg-ww" />\n<meta name="fo-verify" content="345d407e-57f1-4c84-8a3d-20f44d69ff19" />
+<meta name="google-site-verification" content="ln2VgSW4yvhMRJu4jRiBcazNpzcHE45kvwoMJSPg-ww" />\n<meta name="p:domain_verify" content="90bfd4f64f8f644d32555f449c0102aa"/>\n<meta name="fo-verify" content="345d407e-57f1-4c84-8a3d-20f44d69ff19" />
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
